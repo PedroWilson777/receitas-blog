@@ -1,0 +1,39 @@
+name: Publicar Receita Automática
+
+on:
+  schedule:
+    # Roda a cada 30 minutos (UTC)
+    - cron: "*/30 * * * *"
+  workflow_dispatch: # permite rodar manualmente também
+
+jobs:
+  gerar-e-publicar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Gerar receita com Claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/gerar-receita.js
+
+      - name: Commit e push da receita
+        run: |
+          git config user.name "ReceitasBot"
+          git config user.email "bot@receitas.com"
+          git add content/receitas/
+          git diff --staged --quiet || git commit -m "feat: nova receita automática $(date '+%Y-%m-%d %H:%M')"
+          git push
