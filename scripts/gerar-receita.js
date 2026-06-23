@@ -113,7 +113,7 @@ Responda EXATAMENTE neste formato JSON (sem markdown, apenas JSON puro):
   const data = agora.toISOString().split("T")[0];
   const timestamp = agora.toISOString();
 
-  // Gera MDX com frontmatter SEO-otimizado e Schema.org
+  // Gera MDX com frontmatter SEO-otimizado (schema.org vai no frontmatter como JSON string)
   const mdxContent = `---
 title: "${receita.titulo}"
 description: "${receita.descricao}"
@@ -125,33 +125,9 @@ tempo_cozimento: "${receita.tempo_cozimento}"
 porcoes: "${receita.porcoes}"
 dificuldade: "${receita.dificuldade}"
 calorias: "${receita.calorias}"
+ingredientes: ${JSON.stringify(receita.ingredientes)}
 image: "/og-receita.jpg"
 ---
-
-export const schema = {
-  "@context": "https://schema.org",
-  "@type": "Recipe",
-  "name": "${receita.titulo}",
-  "description": "${receita.descricao}",
-  "datePublished": "${timestamp}",
-  "prepTime": "PT${receita.tempo_preparo.replace(/\D/g, "")}M",
-  "cookTime": "PT${receita.tempo_cozimento.replace(/\D/g, "")}M",
-  "recipeYield": "${receita.porcoes}",
-  "recipeCategory": "${receita.categorias[0] || "Prato Principal"}",
-  "recipeCuisine": "Brasileira",
-  "nutrition": {
-    "@type": "NutritionInformation",
-    "calories": "${receita.calorias}"
-  },
-  "recipeIngredient": ${JSON.stringify(receita.ingredientes)},
-  "recipeInstructions": ${JSON.stringify(
-    receita.modo_preparo.map((passo, i) => ({
-      "@type": "HowToStep",
-      "position": i + 1,
-      "text": passo,
-    }))
-  )}
-}
 
 # ${receita.titulo}
 
