@@ -7,8 +7,9 @@ export async function generateStaticParams() {
   return receitas.map((r) => ({ slug: r.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const receita = await getReceita(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const receita = await getReceita(slug);
   if (!receita) return {};
   return {
     title: receita.frontmatter.title,
@@ -22,8 +23,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ReceitaPage({ params }: { params: { slug: string } }) {
-  const receita = await getReceita(params.slug);
+export default async function ReceitaPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const receita = await getReceita(slug);
   if (!receita) notFound();
 
   const fm = receita.frontmatter;
