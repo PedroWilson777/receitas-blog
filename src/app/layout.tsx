@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
   description:
     "Receitas caseiras brasileiras fáceis e deliciosas. Aprenda a cozinhar pratos tradicionais com ingredientes simples.",
-  metadataBase: new URL("https://receitasdavovo.com.br"),
+  metadataBase: new URL("https://saboresdavovo.com.br"),
   openGraph: {
     type: "website",
     locale: "pt_BR",

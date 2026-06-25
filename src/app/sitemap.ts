@@ -2,7 +2,7 @@ import { getAllReceitas } from "@/lib/receitas";
 
 export default async function sitemap() {
   const receitas = await getAllReceitas();
-  const base = "https://receitasdavovo.com.br";
+  const base = "https://saboresdavovo.com.br";
 
   const receitaUrls = receitas.map((r) => ({
     url: `${base}/receita/${r.slug}`,
