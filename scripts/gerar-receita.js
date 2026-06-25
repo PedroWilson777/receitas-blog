@@ -10,10 +10,23 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const client = new Anthropic(); // usa ANTHROPIC_API_KEY do env
+const client = new Anthropic();
+const PEXELS_KEY = process.env.PEXELS_API_KEY;
+
+async function buscarImagem(titulo) {
+  if (!PEXELS_KEY) return null;
+  const query = encodeURIComponent(titulo.split(" ").slice(0, 4).join(" ") + " comida brasileira");
+  const res = await fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=1&orientation=landscape`, {
+    headers: { Authorization: PEXELS_KEY },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.photos?.[0]?.src?.large2x ?? null;
+}
 
 // Banco de temas para variar os títulos (long-tail keywords reais)
 const TEMAS = [
+  // Clássicos caseiros
   "frango grelhado para emagrecer",
   "bolo de cenoura sem glúten",
   "feijão tropeiro mineiro tradicional",
@@ -34,6 +47,61 @@ const TEMAS = [
   "omelete recheada proteica",
   "quiche de queijo e presunto",
   "cookies de aveia e banana",
+  // Receitas caseiras brasileiras
+  "almôndegas ao molho de tomate caseiro",
+  "escondidinho de carne moída com purê",
+  "carne assada na panela de pressão suculenta",
+  "frango caipira ensopado com legumes",
+  "tutu de feijão mineiro com torresmo",
+  "caldo de feijão cremoso com bacon",
+  "arroz carreteiro gaúcho tradicional",
+  "farofa de banana com manteiga",
+  "macarrão ao molho branco com frango",
+  "lasanha de carne moída com molho bechamel",
+  "nhoque de batata ao molho pomodoro",
+  "polenta cremosa com linguiça e cogumelos",
+  "buchada de aves com legumes",
+  "bolinho de bacalhau crocante",
+  "moqueca de peixe baiana com azeite de dendê",
+  "vatapá de camarão com amendoim",
+  "bobó de camarão cremoso",
+  "peixe grelhado com molho de limão e ervas",
+  "tilápia assada no forno com alho",
+  "salmão grelhado com legumes salteados",
+  "picanha assada na churrasqueira",
+  "costela de porco assada lentamente",
+  "frango xadrez com castanha de caju",
+  "strogonoff de frango com creme de leite",
+  "bife acebolado com fritas caseiras",
+  "espaguete à carbonara brasileira",
+  "risoto de funghi com parmesão",
+  "torta de legumes com massa podre",
+  "empadão de frango cremoso",
+  "coxas de frango assadas com ervas",
+  "salada de macarrão com atum e maionese",
+  "salpicão de frango com batata palha",
+  "vinagrete brasileiro clássico",
+  "tabule árabe com hortelã",
+  "bolo de chocolate fofinho de liquidificador",
+  "bolo de fubá caipira com erva-doce",
+  "bolo de banana com canela e aveia",
+  "bolo gelado de coco com leite condensado",
+  "pavê de chocolate com biscoito",
+  "mousse de maracujá cremoso",
+  "pudim de tapioca com coco",
+  "quindim tradicional baiano",
+  "cocada cremosa de forno",
+  "beijinho de coco para festa",
+  "brigadeiro de pistache gourmet",
+  "doce de leite caseiro na panela de pressão",
+  "compota de goiaba com queijo minas",
+  "canjica branca com amendoim",
+  "curau de milho verde com canela",
+  "sopa creme de abóbora com gengibre",
+  "caldo verde com linguiça calabresa",
+  "sopa de cebola gratinada com queijo",
+  "creme de milho verde simples",
+  "sopa de mandioca com frango desfiado",
 ];
 
 function slugify(texto) {
@@ -162,10 +230,17 @@ ${receita.modo_preparo.map((p, i) => `${i + 1}. ${p}`).join("\n\n")}
 ${receita.variacoes}
 `;
 
+  // Busca imagem no Pexels (se a key estiver configurada)
+  const imageUrl = await buscarImagem(receita.titulo);
+
+  const mdxFinal = imageUrl
+    ? mdxContent.replace('image: "/og-receita.jpg"', `image: "${imageUrl}"`)
+    : mdxContent;
+
   const filename = `${data}-${slug}.mdx`;
   const filepath = path.join(__dirname, "../content/receitas", filename);
 
-  fs.writeFileSync(filepath, mdxContent, "utf-8");
+  fs.writeFileSync(filepath, mdxFinal, "utf-8");
   console.log(`✅ Receita salva: ${filename}`);
   console.log(`   Tokens usados: ${message.usage.input_tokens + message.usage.output_tokens}`);
 

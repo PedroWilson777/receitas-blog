@@ -93,10 +93,16 @@ export default async function ReceitaPage({ params }: { params: Promise<{ slug: 
               ))}
             </div>
 
-            {/* Imagem placeholder */}
-            <div className="bg-gradient-to-br from-orange-100 to-amber-50 rounded-2xl h-56 flex items-center justify-center text-7xl mb-8">
-              🍽️
-            </div>
+            {/* Imagem */}
+            {fm.image && fm.image !== "/og-receita.jpg" ? (
+              <div className="rounded-2xl overflow-hidden mb-8 h-64 md:h-80">
+                <img src={fm.image} alt={fm.title} className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="bg-gradient-to-br from-orange-100 to-amber-50 rounded-2xl h-56 flex items-center justify-center text-7xl mb-8">
+                🍽️
+              </div>
+            )}
 
             {/* Ingredientes + Modo de preparo lado a lado */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
