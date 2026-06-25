@@ -95,8 +95,13 @@ export default async function ReceitaPage({ params }: { params: Promise<{ slug: 
 
             {/* Imagem */}
             {fm.image && fm.image !== "/og-receita.jpg" ? (
-              <div className="rounded-2xl overflow-hidden mb-8 h-64 md:h-80">
-                <img src={fm.image} alt={fm.title} className="w-full h-full object-cover" />
+              <div className="rounded-2xl overflow-hidden mb-8 bg-gray-100">
+                <img
+                  src={fm.image}
+                  alt={fm.title}
+                  className="w-full h-auto object-contain max-h-[480px]"
+                  style={{ display: "block" }}
+                />
               </div>
             ) : (
               <div className="bg-gradient-to-br from-orange-100 to-amber-50 rounded-2xl h-56 flex items-center justify-center text-7xl mb-8">
