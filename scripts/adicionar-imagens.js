@@ -37,7 +37,8 @@ async function main() {
     const filepath = path.join(DIR, arquivo);
     const conteudo = fs.readFileSync(filepath, "utf-8");
 
-    if (!conteudo.includes('image: "/og-receita.jpg"')) continue;
+    // Pula se já tem imagem real
+    if (conteudo.includes("image: \"https://")) continue;
 
     // Extrai título do frontmatter
     const match = conteudo.match(/^title:\s*"(.+?)"/m);
@@ -52,7 +53,14 @@ async function main() {
       continue;
     }
 
-    const novo = conteudo.replace('image: "/og-receita.jpg"', `image: "${imageUrl}"`);
+    // Insere ou substitui o campo image no frontmatter
+    let novo;
+    if (conteudo.includes('image: "/og-receita.jpg"')) {
+      novo = conteudo.replace('image: "/og-receita.jpg"', `image: "${imageUrl}"`);
+    } else {
+      // Adiciona antes do fechamento do frontmatter
+      novo = conteudo.replace(/^---\n([\s\S]*?)\n---/, (_, body) => `---\n${body}\nimage: "${imageUrl}"\n---`);
+    }
     fs.writeFileSync(filepath, novo, "utf-8");
     console.log(`   ✅ Imagem adicionada`);
     atualizados++;
