@@ -152,7 +152,10 @@ async function main() {
     } else if (conteudo.includes('image: "https://')) {
       novo = conteudo.replace(/image: "https:\/\/[^"]+"/m, `image: "${imageUrl}"`);
     } else {
-      novo = conteudo.replace(/^(---\n[\s\S]*?)(---)/m, `$1image: "${imageUrl}"\n$2`);
+      // Insere antes do segundo --- (funciona com \r\n e \n)
+      const closingFence = conteudo.indexOf('\n---', 3);
+      if (closingFence === -1) continue;
+      novo = conteudo.slice(0, closingFence) + `\nimage: "${imageUrl}"` + conteudo.slice(closingFence);
     }
 
     fs.writeFileSync(filepath, novo, "utf-8");
