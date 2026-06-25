@@ -1,81 +1,82 @@
 import { getAllReceitas } from "@/lib/receitas";
 import Link from "next/link";
+import AdSlot from "@/components/AdSlot";
 
-const EMOJIS: Record<string, string> = {
-  bolos: "🎂", carnes: "🥩", sopas: "🍲", doces: "🍮",
-  frango: "🍗", peixe: "🐟", massas: "🍝", saladas: "🥗",
-  lanches: "🥪", bebidas: "🥤",
-};
-
-function getEmoji(categorias: string[]) {
-  for (const c of categorias) {
-    for (const [key, emoji] of Object.entries(EMOJIS)) {
-      if (c.toLowerCase().includes(key)) return emoji;
-    }
-  }
+const EMOJI_MAP: [string, string][] = [
+  ["bolo","🎂"],["cookie","🍪"],["torta","🥧"],["frango","🍗"],["peixe","🐟"],
+  ["carne","🥩"],["sopa","🍲"],["massa","🍝"],["macarrão","🍝"],["salada","🥗"],
+  ["arroz","🍚"],["feijão","🫘"],["ovo","🍳"],["doce","🍮"],["pudim","🍮"],
+  ["vitamina","🥤"],["suco","🍹"],["pão","🍞"],["pizza","🍕"],["risoto","🍚"],
+];
+function emoji(titulo: string) {
+  const t = titulo.toLowerCase();
+  for (const [k, e] of EMOJI_MAP) if (t.includes(k)) return e;
   return "🍽️";
 }
 
 export default async function Home() {
   const receitas = await getAllReceitas();
-  const recentes = receitas.slice(0, 12);
 
   return (
-    <>
+    <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Hero */}
-      <section className="text-center py-12 mb-10">
-        <div className="text-5xl mb-4">👵🍳</div>
-        <h1 className="text-4xl font-bold text-gray-800 mb-3">
-          Receitas Caseiras Brasileiras
-        </h1>
-        <p className="text-gray-500 text-lg max-w-xl mx-auto">
-          Pratos simples, deliciosos e fáceis de fazer. Nova receita publicada toda hora!
-        </p>
-        <div className="mt-4 inline-flex items-center gap-2 bg-orange-100 text-orange-700 text-sm px-4 py-2 rounded-full">
-          <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-          {receitas.length} receitas publicadas
+      <section className="bg-gradient-to-r from-orange-500 to-amber-400 text-white rounded-2xl p-8 mb-8 text-center">
+        <h1 className="text-4xl font-bold mb-2">Sabores da Vovó</h1>
+        <p className="text-orange-100 text-lg">Receitas caseiras brasileiras fáceis e deliciosas</p>
+        <div className="mt-3 inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm">
+          <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+          {receitas.length} receitas publicadas · nova receita a cada 30 min
         </div>
       </section>
 
-      {/* Grid */}
-      <section>
-        <h2 className="text-2xl font-bold text-gray-700 mb-6 flex items-center gap-2">
-          📋 Receitas Recentes
-        </h2>
-        {recentes.length === 0 ? (
-          <p className="text-gray-400 text-center py-16">Carregando receitas...</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recentes.map((receita) => (
+      <div className="flex gap-8">
+        {/* Conteúdo principal */}
+        <main className="flex-1 min-w-0">
+          <h2 className="text-xl font-bold text-gray-700 mb-5 pb-2 border-b border-gray-200">
+            🕐 Receitas Recentes
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {receitas.map((r) => (
               <Link
-                key={receita.slug}
-                href={`/receita/${receita.slug}`}
-                className="group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border border-orange-100 hover:border-orange-300"
+                key={r.slug}
+                href={`/receita/${r.slug}`}
+                className="group bg-white rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-md transition-all overflow-hidden flex"
               >
-                <div className="bg-gradient-to-br from-orange-100 to-amber-50 h-36 flex items-center justify-center text-6xl group-hover:scale-110 transition-transform duration-200">
-                  {getEmoji(receita.categorias)}
+                <div className="w-24 h-24 bg-orange-50 flex-shrink-0 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform">
+                  {emoji(r.titulo)}
                 </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-800 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors">
-                    {receita.titulo}
+                <div className="p-3 flex flex-col justify-center min-w-0">
+                  <h3 className="font-bold text-gray-800 text-sm leading-snug line-clamp-2 group-hover:text-orange-600 transition-colors mb-1">
+                    {r.titulo}
                   </h3>
-                  <p className="text-xs text-gray-400 line-clamp-2 mb-3">
-                    {receita.descricao}
-                  </p>
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    <span className="bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">
-                      ⏱️ {receita.tempo_preparo}
-                    </span>
-                    <span className="bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
-                      {receita.dificuldade}
-                    </span>
+                  <div className="flex gap-2 text-xs text-gray-400 flex-wrap">
+                    <span>⏱️ {r.tempo_preparo}</span>
+                    <span>·</span>
+                    <span>{r.dificuldade}</span>
                   </div>
                 </div>
               </Link>
             ))}
           </div>
-        )}
-      </section>
-    </>
+        </main>
+
+        {/* Sidebar com ads */}
+        <aside className="hidden lg:flex flex-col gap-6 w-64 flex-shrink-0">
+          <AdSlot size="sidebar" />
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h3 className="font-bold text-gray-700 text-sm mb-3">🔥 Categorias</h3>
+            <div className="flex flex-wrap gap-2">
+              {["Bolos","Carnes","Sopas","Massas","Doces","Frango","Saladas","Lanches"].map(c => (
+                <a key={c} href={`/categoria/${c.toLowerCase()}`}
+                  className="bg-orange-50 hover:bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full transition-colors">
+                  {c}
+                </a>
+              ))}
+            </div>
+          </div>
+          <AdSlot size="sidebar" />
+        </aside>
+      </div>
+    </div>
   );
 }

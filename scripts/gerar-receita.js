@@ -126,7 +126,9 @@ porcoes: "${receita.porcoes}"
 dificuldade: "${receita.dificuldade}"
 calorias: "${receita.calorias}"
 ingredientes: ${JSON.stringify(receita.ingredientes)}
-image: "/og-receita.jpg"
+passos: ${JSON.stringify(receita.modo_preparo)}
+dicas: "${receita.dicas.replace(/"/g, "'")}"
+variacoes: "${receita.variacoes.replace(/"/g, "'")}"
 ---
 
 # ${receita.titulo}
