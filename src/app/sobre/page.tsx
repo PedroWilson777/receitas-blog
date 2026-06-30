@@ -28,7 +28,7 @@ export default function Sobre() {
       <h2>Contato</h2>
       <p>
         Encontrou algum erro em uma receita ou tem alguma sugestão? Escreva para{" "}
-        <a href="mailto:contato@saboresdavovo.com.br">contato@saboresdavovo.com.br</a>.
+        <a href="mailto:pedrow993@gmail.com">pedrow993@gmail.com</a>.
       </p>
 
       <p>
