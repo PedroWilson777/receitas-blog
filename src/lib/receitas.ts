@@ -12,6 +12,7 @@ export interface ReceitaMeta {
   tempo_preparo: string;
   dificuldade: string;
   categorias: string[];
+  image?: string;
 }
 
 export async function getAllReceitas(): Promise<ReceitaMeta[]> {
@@ -33,6 +34,7 @@ export async function getAllReceitas(): Promise<ReceitaMeta[]> {
         tempo_preparo: data.tempo_preparo ?? "",
         dificuldade: data.dificuldade ?? "",
         categorias: data.categorias ?? [],
+        image: data.image && data.image !== "/og-receita.jpg" ? data.image : undefined,
       } as ReceitaMeta;
     })
     .sort((a, b) => b.date.localeCompare(a.date)); // mais recentes primeiro

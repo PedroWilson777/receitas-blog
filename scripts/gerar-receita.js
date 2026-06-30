@@ -8,6 +8,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { traduzirTitulo } from "./traducoes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const client = new Anthropic();
@@ -15,7 +16,7 @@ const PEXELS_KEY = process.env.PEXELS_API_KEY;
 
 async function buscarImagem(titulo) {
   if (!PEXELS_KEY) return null;
-  const query = encodeURIComponent(titulo.split(" ").slice(0, 4).join(" ") + " comida brasileira");
+  const query = encodeURIComponent(traduzirTitulo(titulo));
   const res = await fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=1&orientation=landscape`, {
     headers: { Authorization: PEXELS_KEY },
   });
@@ -197,6 +198,7 @@ ingredientes: ${JSON.stringify(receita.ingredientes)}
 passos: ${JSON.stringify(receita.modo_preparo)}
 dicas: "${receita.dicas.replace(/"/g, "'")}"
 variacoes: "${receita.variacoes.replace(/"/g, "'")}"
+image: "/og-receita.jpg"
 ---
 
 # ${receita.titulo}

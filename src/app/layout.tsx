@@ -18,19 +18,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR">
       <body className={`${inter.className} bg-gray-50 min-h-screen`}>
-        {/* Header */}
-        <header className="bg-orange-600 text-white shadow-md">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Header — fundo na mesma cor creme da logo, pra ela encaixar sem corte */}
+        <header className="bg-[#FEF2E3] shadow-md border-b border-orange-100">
+          <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
             <a href="/" className="flex items-center gap-3">
-              <span className="text-3xl">🍳</span>
+              <img src="/logo.png" alt="Sabores da Vovó" className="w-14 h-14 rounded-full object-cover" />
               <div>
-                <div className="text-xl font-bold leading-none">Sabores da Vovó</div>
-                <div className="text-xs text-orange-200">Receitas caseiras brasileiras</div>
+                <div className="text-xl font-bold leading-none text-amber-900">Sabores da Vovó</div>
+                <div className="text-xs text-amber-700">Receitas caseiras brasileiras</div>
               </div>
             </a>
-            <nav className="hidden md:flex gap-5 text-sm font-medium">
+            <nav className="hidden md:flex gap-5 text-sm font-medium text-amber-800">
               {["Bolos","Carnes","Sopas","Massas","Doces","Saladas"].map(c => (
-                <a key={c} href={`/categoria/${c.toLowerCase()}`} className="hover:text-orange-200 transition-colors">{c}</a>
+                <a key={c} href={`/categoria/${c.toLowerCase()}`} className="hover:text-orange-600 transition-colors">{c}</a>
               ))}
             </nav>
           </div>
