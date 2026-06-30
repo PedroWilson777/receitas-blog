@@ -14,9 +14,20 @@ export const metadata: Metadata = {
   openGraph: { type: "website", locale: "pt_BR", siteName: "Sabores da Vovó" },
 };
 
+const ADSENSE_PUB_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
+      <head>
+        {ADSENSE_PUB_ID && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUB_ID}`}
+            crossOrigin="anonymous"
+          />
+        )}
+      </head>
       <body className={`${inter.className} bg-gray-50 min-h-screen`}>
         {/* Header — fundo na mesma cor creme da logo, pra ela encaixar sem corte */}
         <header className="bg-[#FEF2E3] shadow-md border-b border-orange-100">
@@ -42,6 +53,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-7xl mx-auto px-4 text-center text-sm text-orange-200">
             <p className="text-white font-semibold text-base mb-1">🍳 Sabores da Vovó</p>
             <p>© {new Date().getFullYear()} Culinária Brasileira com amor · saboresdavovo.com.br</p>
+            <div className="mt-3 flex items-center justify-center gap-4">
+              <a href="/sobre" className="hover:text-white transition-colors">Sobre</a>
+              <a href="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</a>
+            </div>
           </div>
         </footer>
       </body>
