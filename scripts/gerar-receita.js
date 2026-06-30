@@ -14,15 +14,40 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const client = new Anthropic();
 const PEXELS_KEY = process.env.PEXELS_API_KEY;
 
-async function buscarImagem(titulo) {
-  if (!PEXELS_KEY) return null;
-  const query = encodeURIComponent(traduzirTitulo(titulo));
-  const res = await fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=1&orientation=landscape`, {
+async function buscarFoto(query) {
+  const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=3&orientation=landscape`, {
     headers: { Authorization: PEXELS_KEY },
   });
   if (!res.ok) return null;
   const data = await res.json();
   return data.photos?.[0]?.src?.large2x ?? null;
+}
+
+// Tenta várias queries (da mais específica pra mais genérica) até achar uma foto.
+// Garante que toda receita publicada tenha imagem real — nunca publica sem foto.
+async function buscarImagem(titulo, categorias) {
+  if (!PEXELS_KEY) return null;
+
+  const tentativas = [
+    traduzirTitulo(titulo),
+    titulo.split(" ").slice(0, 3).join(" ") + " food",
+    `${categorias?.[0] ?? "homemade"} Brazilian food photography`,
+    "Brazilian homemade food dish",
+  ];
+
+  for (const query of tentativas) {
+    for (let i = 0; i < 2; i++) {
+      try {
+        const url = await buscarFoto(query);
+        if (url) return url;
+      } catch {
+        // tenta de novo / próxima query
+      }
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  }
+
+  return null;
 }
 
 // Banco de temas para variar os títulos (long-tail keywords reais)
@@ -232,12 +257,16 @@ ${receita.modo_preparo.map((p, i) => `${i + 1}. ${p}`).join("\n\n")}
 ${receita.variacoes}
 `;
 
-  // Busca imagem no Pexels (se a key estiver configurada)
-  const imageUrl = await buscarImagem(receita.titulo);
+  // Busca imagem no Pexels — obrigatória. Nunca publica receita sem foto real.
+  const imageUrl = await buscarImagem(receita.titulo, receita.categorias);
 
-  const mdxFinal = imageUrl
-    ? mdxContent.replace('image: "/og-receita.jpg"', `image: "${imageUrl}"`)
-    : mdxContent;
+  if (!imageUrl) {
+    console.error(`❌ Não foi possível encontrar imagem para "${receita.titulo}". Receita NÃO publicada — tentaremos de novo no próximo ciclo.`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const mdxFinal = mdxContent.replace('image: "/og-receita.jpg"', `image: "${imageUrl}"`);
 
   const filename = `${data}-${slug}.mdx`;
   const filepath = path.join(__dirname, "../content/receitas", filename);
@@ -249,4 +278,12 @@ ${receita.variacoes}
   return { titulo: receita.titulo, slug, filename };
 }
 
-gerarReceita().catch(console.error);
+if (!PEXELS_KEY) {
+  console.error("❌ PEXELS_API_KEY não configurada — não dá pra garantir imagem, abortando.");
+  process.exitCode = 1;
+} else {
+  gerarReceita().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}
