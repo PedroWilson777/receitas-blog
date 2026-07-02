@@ -272,6 +272,14 @@ ${receita.variacoes}
   const filepath = path.join(__dirname, "../content/receitas", filename);
 
   fs.writeFileSync(filepath, mdxFinal, "utf-8");
+
+  // Registra qual receita acabou de sair — o postar-pinterest.js lê daqui (não é commitado)
+  fs.writeFileSync(
+    path.join(__dirname, ".ultima-receita.json"),
+    JSON.stringify({ filename, titulo: receita.titulo, slug }),
+    "utf-8"
+  );
+
   console.log(`✅ Receita salva: ${filename}`);
   console.log(`   Tokens usados: ${message.usage.input_tokens + message.usage.output_tokens}`);
 

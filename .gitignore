@@ -4,3 +4,6 @@ node_modules/
 .next/
 
 .vercel
+
+# registro temporário da última receita gerada (usado pelo postar-pinterest.js)
+scripts/.ultima-receita.json

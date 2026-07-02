@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "gerar": "node scripts/gerar-receita.js"
+    "gerar": "node scripts/gerar-receita.js",
+    "pinterest": "node scripts/postar-pinterest.js",
+    "pinterest:auth": "node scripts/pinterest-auth.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
