@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Receitas caseiras brasileiras fáceis e deliciosas. Aprenda a cozinhar pratos tradicionais com ingredientes simples.",
   metadataBase: new URL("https://saboresdavovo.com.br"),
   openGraph: { type: "website", locale: "pt_BR", siteName: "Sabores da Vovó" },
+  // Verificação de domínio do Pinterest (reivindicação do site — Rich Pins + analytics)
+  other: { "p:domain_verify": "ae9b87ea335ddd82bff72838808f587b" },
 };
 
 const ADSENSE_PUB_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID;
