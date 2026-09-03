@@ -1,9 +1,11 @@
 name: Publicar Receita Automática
 
 on:
-  schedule:
-    # Roda a cada 30 minutos (UTC)
-    - cron: "*/30 * * * *"
+  # Cron desativado em 2026-09-03 — publicação direta sem revisão humana gerava
+  # duplicatas em escala (ver auditoria AdSense/SEO de 2026-09-03). Rodar só
+  # manualmente (workflow_dispatch) até o fluxo de revisão editorial existir.
+  # - schedule:
+  #     - cron: "*/30 * * * *"
   workflow_dispatch: # permite rodar manualmente também
 
 jobs:
