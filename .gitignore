@@ -7,3 +7,8 @@ node_modules/
 
 # registro temporário da última receita gerada (usado pelo postar-pinterest.js)
 scripts/.ultima-receita.json
+
+# relatórios de diagnóstico/consolidação e backups de arquivos removidos —
+# gerados localmente por scripts/diagnostico.mjs e scripts/plano-consolidacao.mjs,
+# não fazem parte do site publicado
+outputs/
