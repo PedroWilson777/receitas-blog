@@ -12,8 +12,7 @@ export default async function Home() {
         <h1 className="text-4xl font-bold mb-2">Sabores da Vovó</h1>
         <p className="text-orange-100 text-lg">Receitas caseiras brasileiras fáceis e deliciosas</p>
         <div className="mt-3 inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm">
-          <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-          {receitas.length} receitas publicadas · nova receita a cada 30 min
+          {receitas.length} receitas publicadas
         </div>
       </section>
 

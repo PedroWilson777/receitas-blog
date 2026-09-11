@@ -18,16 +18,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIR = path.join(__dirname, "../content/receitas");
 const OUT_DIR = path.join(__dirname, "../outputs");
 
+// Espelha src/lib/categorias.ts — mantenha os dois em sincronia.
 const CATEGORIAS = [
-  { label: "Bolos", slug: "bolos", keyword: "bolo" },
-  { label: "Carnes", slug: "carnes", keyword: "carne" },
-  { label: "Frango", slug: "frango", keyword: "frango" },
-  { label: "Peixes", slug: "peixes", keyword: "peixe" },
-  { label: "Sopas", slug: "sopas", keyword: "sopa" },
-  { label: "Massas", slug: "massas", keyword: "massa" },
-  { label: "Doces", slug: "doces", keyword: "doce" },
-  { label: "Saladas", slug: "saladas", keyword: "salada" },
-  { label: "Lanches", slug: "lanches", keyword: "lanche" },
+  { label: "Bolos", slug: "bolos", sinonimos: ["bolo", "bolos", "cupcake", "cupcakes"] },
+  { label: "Carnes", slug: "carnes", sinonimos: ["carne", "carnes", "bovina", "bovino", "suina", "suino", "picanha", "costela", "bife"] },
+  { label: "Frango", slug: "frango", sinonimos: ["frango", "galinha", "aves", "ave"] },
+  { label: "Peixes", slug: "peixes", sinonimos: ["peixe", "peixes", "camarao", "camaroes", "frutos do mar", "mariscos", "tilapia", "salmao", "bacalhau", "moqueca", "vatapa", "bobo"] },
+  { label: "Sopas", slug: "sopas", sinonimos: ["sopa", "sopas", "caldo", "caldos", "creme"] },
+  { label: "Massas", slug: "massas", sinonimos: ["massa", "massas", "macarrao", "espaguete", "lasanha", "nhoque", "risoto", "fettuccine"] },
+  { label: "Doces", slug: "doces", sinonimos: ["doce", "doces", "sobremesa", "sobremesas", "confeitaria", "brigadeiro", "pudim", "mousse", "cocada", "quindim", "beijinho", "doceria"] },
+  { label: "Saladas", slug: "saladas", sinonimos: ["salada", "saladas", "vinagrete", "tabule"] },
+  { label: "Lanches", slug: "lanches", sinonimos: ["lanche", "lanches", "sanduiche", "coxinha", "salgado", "salgados", "empada", "empadao"] },
 ];
 
 const STOPWORDS = new Set([
@@ -140,27 +141,20 @@ function detectarColisaoSlug(receitas) {
     .map(([slug, itens]) => ({ slug, ocorrencias: itens.length, arquivos: itens.map((i) => i.filename) }));
 }
 
+function contemPalavra(frase, sinonimo) {
+  const regex = new RegExp(`\\b${sinonimo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}s?\\b`);
+  return regex.test(normalizar(frase));
+}
+
 function detectarContaminacaoCategoria(receitas) {
   const porCategoria = {};
   for (const cat of CATEGORIAS) porCategoria[cat.slug] = [];
 
   for (const r of receitas) {
-    const camposIA = r.categorias.map(normalizar).join(" | ");
     for (const cat of CATEGORIAS) {
-      const bateTitulo = normalizar(r.title).includes(cat.keyword);
-      const bateCategoriaIA = r.categorias.some((c) => normalizar(c).includes(cat.keyword));
-      if (bateTitulo || bateCategoriaIA) {
-        // contaminação: bateu na keyword da categoria, mas a categoria da IA
-        // não menciona essa keyword nem de perto (match veio só do título ou de
-        // uma string livre da IA, não de uma classificação real)
-        const suspeito = !r.categorias.some((c) => normalizar(c) === cat.keyword || normalizar(c) === cat.label.toLowerCase());
-        porCategoria[cat.slug].push({
-          titulo: r.title,
-          arquivo: r.filename,
-          categorias_ia: r.categorias,
-          via: bateTitulo ? "titulo" : "categoria_ia_livre",
-          suspeito,
-        });
+      const bate = r.categorias.some((c) => cat.sinonimos.some((s) => contemPalavra(c, s)));
+      if (bate) {
+        porCategoria[cat.slug].push({ titulo: r.title, arquivo: r.filename, categorias_ia: r.categorias });
       }
     }
   }
@@ -168,12 +162,7 @@ function detectarContaminacaoCategoria(receitas) {
   const resumo = {};
   for (const cat of CATEGORIAS) {
     const itens = porCategoria[cat.slug];
-    resumo[cat.slug] = {
-      label: cat.label,
-      total: itens.length,
-      suspeitos: itens.filter((i) => i.suspeito).length,
-      exemplos_suspeitos: itens.filter((i) => i.suspeito).slice(0, 8),
-    };
+    resumo[cat.slug] = { label: cat.label, total: itens.length, exemplos: itens.slice(0, 8) };
   }
   return resumo;
 }
@@ -221,9 +210,9 @@ function main() {
   console.log(`— Colisões de slug (mesma URL /receita/<slug> para arquivos diferentes): ${colisoesSlug.length}`);
 
   const categorias = detectarContaminacaoCategoria(receitas);
-  console.log(`— Contaminação de categoria:`);
+  console.log(`— Receitas por categoria (via campo categorias da IA, casamento por palavra inteira):`);
   for (const [slug, info] of Object.entries(categorias)) {
-    console.log(`   ${info.label}: ${info.total} receitas casam a keyword, ${info.suspeitos} suspeitas de contaminação`);
+    console.log(`   ${info.label}: ${info.total} receitas`);
   }
 
   const reusoImagem = detectarReusoImagem(receitas);
